@@ -1,7 +1,5 @@
-﻿namespace RedisContext
+﻿namespace RedisContext.Entities
 {
-    using System.Collections.Generic;
-
     public class IndexEntity : RedisEntity
     {
         public IndexEntity() { }

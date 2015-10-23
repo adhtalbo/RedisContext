@@ -2,11 +2,12 @@ namespace RedisContext
 {
     using System;
     using System.Linq;
+    using Migration;
 
     [Serializable]
     public abstract class RedisEntity
     {
-        public string Etag { get; set; }
+        public string Etag { get; internal set; }
 
         public string Id { get; set; }
 

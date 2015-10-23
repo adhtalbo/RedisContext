@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisContext", "RedisContext\RedisContext.csproj", "{BA9B457D-9FE2-4670-8896-0BA8DC13D93A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisContextTests", "RedisContextTests\RedisContextTests.csproj", "{66A4EA18-5900-4B0A-B2AE-A2E4BBDCED5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{BA9B457D-9FE2-4670-8896-0BA8DC13D93A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA9B457D-9FE2-4670-8896-0BA8DC13D93A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA9B457D-9FE2-4670-8896-0BA8DC13D93A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66A4EA18-5900-4B0A-B2AE-A2E4BBDCED5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66A4EA18-5900-4B0A-B2AE-A2E4BBDCED5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66A4EA18-5900-4B0A-B2AE-A2E4BBDCED5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66A4EA18-5900-4B0A-B2AE-A2E4BBDCED5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

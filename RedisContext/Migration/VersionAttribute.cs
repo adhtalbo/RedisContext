@@ -1,4 +1,4 @@
-﻿namespace RedisContext
+﻿namespace RedisContext.Migration
 {
     using System;
 

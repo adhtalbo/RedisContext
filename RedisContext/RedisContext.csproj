@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MsgPack, Version=0.6.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
+      <HintPath>..\packages\MsgPack.Cli.0.6.5\lib\net45\MsgPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="StackExchange.Redis, Version=1.0.316.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StackExchange.Redis.1.0.481\lib\net45\StackExchange.Redis.dll</HintPath>
       <Private>True</Private>
@@ -44,13 +48,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IndexEntity.cs" />
-    <Compile Include="MigrateAttribute.cs" />
+    <Compile Include="Entities\IndexEntity.cs" />
+    <Compile Include="Migration\MigrateAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedisContext.cs" />
     <Compile Include="RedisEntity.cs" />
+    <Compile Include="Migration\EntityProperties.cs" />
+    <Compile Include="Migration\EntityProperty.cs" />
     <Compile Include="RedisSet.cs" />
-    <Compile Include="VersionAttribute.cs" />
+    <Compile Include="Migration\VersionAttribute.cs" />
+    <Compile Include="Serializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
