@@ -27,6 +27,6 @@
 
             // Assert
             Assert.True(context.ConnectionMultiplexer.IsConnected);
-        } 
+        }
     }
 }

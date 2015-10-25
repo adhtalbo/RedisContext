@@ -1,6 +1,7 @@
 ﻿namespace RedisContext.Migration
 {
     using System;
+    using System.Globalization;
     using MsgPack;
 
     public class EntityProperty : IConvertible
@@ -10,51 +11,6 @@
         public EntityProperty(MessagePackObject obj)
         {
             _messagePackObject = obj;
-        }
-
-        public bool? IsTypeOf<T>()
-        {
-            switch (Type.GetTypeCode(typeof (T)))
-            {
-                // Chars are bytes.
-                case TypeCode.Char:
-                    return _messagePackObject.IsTypeOf<byte>();
-
-                // Decimals are strings.
-                case TypeCode.Decimal:
-                    double output;
-                    return _messagePackObject.IsTypeOf<string>().HasValue
-                           &&
-                           _messagePackObject.IsTypeOf<string>().Value
-                           &&
-                           Double.TryParse(_messagePackObject.AsString(), System.Globalization.NumberStyles.Any,
-                               System.Globalization.NumberFormatInfo.InvariantInfo, out output);
-
-                case TypeCode.DateTime:
-                    return _messagePackObject.IsTypeOf<long>();
-                default:
-                    return _messagePackObject.IsTypeOf<T>();
-            }
-            
-        }
-
-        public bool TryGet<T>(out T value)
-        {
-            try
-            {
-                value = (T) Convert.ChangeType(this, typeof (T));
-                return true;
-            }
-            catch (InvalidCastException)
-            {
-                value = default(T);
-                return false;
-            }
-            catch (InvalidOperationException)
-            {
-                value = default(T);
-                return false;
-            }
         }
 
         TypeCode IConvertible.GetTypeCode()
@@ -69,7 +25,7 @@
 
         char IConvertible.ToChar(IFormatProvider provider)
         {
-            return (char)_messagePackObject.AsByte();
+            return (char) _messagePackObject.AsByte();
         }
 
         sbyte IConvertible.ToSByte(IFormatProvider provider)
@@ -141,6 +97,50 @@
         object IConvertible.ToType(Type conversionType, IFormatProvider provider)
         {
             return Convert.ChangeType(_messagePackObject.ToObject(), conversionType);
+        }
+
+        public bool? IsTypeOf<T>()
+        {
+            switch (Type.GetTypeCode(typeof (T)))
+            {
+                // Chars are bytes.
+                case TypeCode.Char:
+                    return _messagePackObject.IsTypeOf<byte>();
+
+                // Decimals are strings.
+                case TypeCode.Decimal:
+                    double output;
+                    return _messagePackObject.IsTypeOf<string>().HasValue
+                           &&
+                           _messagePackObject.IsTypeOf<string>().Value
+                           &&
+                           double.TryParse(_messagePackObject.AsString(), NumberStyles.Any,
+                               NumberFormatInfo.InvariantInfo, out output);
+
+                case TypeCode.DateTime:
+                    return _messagePackObject.IsTypeOf<long>();
+                default:
+                    return _messagePackObject.IsTypeOf<T>();
+            }
+        }
+
+        public bool TryGet<T>(out T value)
+        {
+            try
+            {
+                value = (T) Convert.ChangeType(this, typeof (T));
+                return true;
+            }
+            catch (InvalidCastException)
+            {
+                value = default(T);
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                value = default(T);
+                return false;
+            }
         }
     }
 }

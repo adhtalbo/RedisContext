@@ -8,7 +8,7 @@
 
     public class EntityPropertyTests
     {
-        private MessagePackSerializer<MessagePackObject> _unserializer;
+        private readonly MessagePackSerializer<MessagePackObject> _unserializer;
 
         public EntityPropertyTests()
         {
@@ -28,7 +28,7 @@
         {
             // Arrange
             var expected = true;
-            var entityProperty = ToEntityProperty<bool>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isBool = entityProperty.IsTypeOf<bool>();
@@ -44,7 +44,7 @@
         {
             // Arrange
             var expected = 'f';
-            var entityProperty = ToEntityProperty<char>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isChar = entityProperty.IsTypeOf<char>();
@@ -59,8 +59,8 @@
         public void EntityProperty_CanConvertToToSByte()
         {
             // Arrange
-            var expected = (sbyte)'s';
-            var entityProperty = ToEntityProperty<sbyte>(expected);
+            var expected = (sbyte) 's';
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isSByte = entityProperty.IsTypeOf<sbyte>();
@@ -69,14 +69,14 @@
             // Assert
             Assert.True(isSByte);
             Assert.Equal(expected, sbyteValue);
-        } 
+        }
 
         [Fact]
         public void EntityProperty_CanConvertToToByte()
         {
             // Arrange
             var expected = (byte) 'b';
-            var entityProperty = ToEntityProperty<byte>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isByte = entityProperty.IsTypeOf<byte>();
@@ -92,7 +92,7 @@
         {
             // Arrange
             var expected = (short) 5;
-            var entityProperty = ToEntityProperty<short>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isShort = entityProperty.IsTypeOf<short>();
@@ -107,8 +107,8 @@
         public void EntityProperty_CanConvertToToUInt16()
         {
             // Arrange
-            var expected = (ushort)5;
-            var entityProperty = ToEntityProperty<ushort>(expected);
+            var expected = (ushort) 5;
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isUShort = entityProperty.IsTypeOf<ushort>();
@@ -123,8 +123,8 @@
         public void EntityProperty_CanConvertToToInt32()
         {
             // Arrange
-            var expected = (int) 5;
-            var entityProperty = ToEntityProperty<int>(expected);
+            var expected = 5;
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isInt = entityProperty.IsTypeOf<int>();
@@ -139,8 +139,8 @@
         public void EntityProperty_CanConvertToToUInt32()
         {
             // Arrange
-            var expected = (uint)5;
-            var entityProperty = ToEntityProperty<uint>(expected);
+            var expected = (uint) 5;
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isUInt = entityProperty.IsTypeOf<uint>();
@@ -155,8 +155,8 @@
         public void EntityProperty_CanConvertToToInt64()
         {
             // Arrange
-            var expected = (long)5;
-            var entityProperty = ToEntityProperty<long>(expected);
+            var expected = (long) 5;
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isLong = entityProperty.IsTypeOf<long>();
@@ -171,8 +171,8 @@
         public void EntityProperty_CanConvertToToUInt64()
         {
             // Arrange
-            var expected = (ulong)5;
-            var entityProperty = ToEntityProperty<ulong>(expected);
+            var expected = (ulong) 5;
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isULong = entityProperty.IsTypeOf<ulong>();
@@ -188,7 +188,7 @@
         {
             // Arrange
             var expected = (float) 3.14;
-            var entityProperty = ToEntityProperty<float>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isSingle = entityProperty.IsTypeOf<float>();
@@ -203,8 +203,8 @@
         public void EntityProperty_CanConvertToToDouble()
         {
             // Arrange
-            var expected = (double)3.14;
-            var entityProperty = ToEntityProperty<double>(expected);
+            var expected = 3.14;
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isDouble = entityProperty.IsTypeOf<double>();
@@ -219,8 +219,8 @@
         public void EntityProperty_CanConvertToToDecimal()
         {
             // Arrange
-            var expected = (decimal)3.14;
-            var entityProperty = ToEntityProperty<decimal>(expected);
+            var expected = (decimal) 3.14;
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isDecimal = entityProperty.IsTypeOf<decimal>();
@@ -236,7 +236,7 @@
         {
             // Arrange
             var expected = DateTime.Now;
-            var entityProperty = ToEntityProperty<DateTime>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isDateTime = entityProperty.IsTypeOf<DateTime>();
@@ -252,7 +252,7 @@
         {
             // Arrange
             var expected = "SomeTestString";
-            var entityProperty = ToEntityProperty<string>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             var isString = entityProperty.IsTypeOf<string>();
@@ -268,7 +268,7 @@
         {
             // Arrange
             var expected = "SomeTestString";
-            var entityProperty = ToEntityProperty<string>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             string stringValue;
@@ -284,7 +284,7 @@
         {
             // Arrange
             var expected = 5;
-            var entityProperty = ToEntityProperty<int>(expected);
+            var entityProperty = ToEntityProperty(expected);
 
             // Act
             string stringValue;
@@ -293,6 +293,6 @@
             // Assert
             Assert.False(isString);
             Assert.Null(stringValue);
-        } 
+        }
     }
 }

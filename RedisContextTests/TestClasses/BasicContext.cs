@@ -7,7 +7,6 @@
     {
         public BasicContext() : base("127.0.0.1")
         {
-            
         }
 
         public RedisSet<BasicEntity> Entity { get; set; }

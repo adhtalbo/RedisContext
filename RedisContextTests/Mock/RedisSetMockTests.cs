@@ -3,15 +3,15 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using RedisContext.Mock;
     using TestClasses;
     using TestClasses.Entities;
-    using RedisContext.Mock;
     using Xunit;
 
     public class RedisSetMockTests
     {
         private readonly BasicContext _context;
-        
+
         public RedisSetMockTests()
         {
             _context = RedisContextMock<BasicContext>.Create();
@@ -21,7 +21,7 @@
         public async Task RedisSetMock_CanSetAndFetch()
         {
             // Arrange
-            var expected = new BasicEntity()
+            var expected = new BasicEntity
             {
                 Id = "RedisSetMock_CanSetAndFetch"
             };
@@ -41,7 +41,7 @@
         public async Task RedisSetMock_CanDelete()
         {
             // Arrange
-            var expected = new BasicEntity()
+            var expected = new BasicEntity
             {
                 Id = "RedisSetMock_CanDelete"
             };
@@ -51,7 +51,7 @@
             var returned = await _context.Entity.FetchAsync(expected.Id);
             await _context.Entity.DeleteAsync(expected);
             var returnedAfterDelete = await _context.Entity.FetchAsync(expected.Id);
-            
+
 
             // Assert
             Assert.Equal(expected.Id, returned.Id);
@@ -62,12 +62,12 @@
         public async Task RedisSetMock_CanFetchBatch_ByIds()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "A_RedisSetMock_CanFetchBatch_ByIds_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "A_RedisSetMock_CanFetchBatch_ByIds_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
-            await Task.WhenAll( entities.Select(e => _context.Entity.InsertAsync(e)));
+            await Task.WhenAll(entities.Select(e => _context.Entity.InsertAsync(e)));
 
             // Act
             var returned = await _context.Entity.FetchAsync(Enumerable.Range(0, 100).Select(i => idGen(i)));
@@ -76,7 +76,7 @@
             Assert.Equal(100, returned.Count());
             Enumerable.Range(0, 100).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -86,8 +86,8 @@
         public async Task RedisSetMock_CanFetchBatch_ByIdAndLimit()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "B_RedisSetMock_CanFetchBatch_ByIdAndLimit_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "B_RedisSetMock_CanFetchBatch_ByIdAndLimit_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
@@ -100,7 +100,7 @@
             Assert.Equal(50, returned.Count());
             Enumerable.Range(50, 50).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)), string.Format("Id {0} not found in results", i))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -110,8 +110,8 @@
         public async Task RedisSetMock_CanFetchBatch_ByIdLimitAndOffset()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "C_RedisSetMock_CanFetchBatch_ByIdLimitAndOffset_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "C_RedisSetMock_CanFetchBatch_ByIdLimitAndOffset_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
@@ -124,7 +124,7 @@
             Assert.Equal(50, returned.Count());
             Enumerable.Range(50, 50).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)), string.Format("Id {0} not found in results", i))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -134,8 +134,8 @@
         public async Task RedisSetMock_CanFetchBatch_ByMinAndMaxID()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "D_RedisSetMock_CanFetchBatch_ByMinAndMaxID_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "D_RedisSetMock_CanFetchBatch_ByMinAndMaxID_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
@@ -148,7 +148,7 @@
             Assert.Equal(50, returned.Count());
             Enumerable.Range(10, 50).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)), string.Format("Id {0} not found in results", i))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -158,7 +158,7 @@
         public async Task RedisSetMock_Insert_CannotOverwrite()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSetMock_Insert_CannotOverwrite"
             };
@@ -180,12 +180,12 @@
         {
             // Arrange
             var id = "RedisSetMock_InsertOrReplace_CanOverwrite";
-            var entityOld = new BasicEntity()
+            var entityOld = new BasicEntity
             {
                 Id = id,
                 StringValue = "Original"
             };
-            var entityNew = new BasicEntity()
+            var entityNew = new BasicEntity
             {
                 Id = id,
                 StringValue = "Replacement"
@@ -208,9 +208,9 @@
         public async Task RedisSetMock_Update_CannotInsertMissingItem()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
-                Id = "RedisSetMock_Update_CannotInsertMissingItem",
+                Id = "RedisSetMock_Update_CannotInsertMissingItem"
             };
 
             // Act
@@ -229,7 +229,7 @@
         public async Task RedisSetMock_Update_CanUpdateExistingItem()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSetMock_Update_CanUpdateExistingItem",
                 StringValue = "Original"
@@ -254,7 +254,7 @@
         public async Task RedisSetMock_Update_CannotUpdateChangedItem()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSetMock_Update_CannotUpdateChangedItem",
                 StringValue = "Original"
@@ -285,7 +285,7 @@
         public void RedisSetMock_Migrate_MigrationFunctionsGetsCalled()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSet_Migrate_MigrationFunctionsGetsCalled",
                 StringValue = "SomeValue"

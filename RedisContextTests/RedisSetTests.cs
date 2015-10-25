@@ -23,7 +23,7 @@
         public async Task RedisSet_CanSetAndFetch()
         {
             // Arrange
-            var expected = new BasicEntity()
+            var expected = new BasicEntity
             {
                 Id = "RedisSet_CanSetAndFetch"
             };
@@ -43,7 +43,7 @@
         public async Task RedisSet_CanDelete()
         {
             // Arrange
-            var expected = new BasicEntity()
+            var expected = new BasicEntity
             {
                 Id = "RedisSet_CanDelete"
             };
@@ -53,7 +53,7 @@
             var returned = await _context.Entity.FetchAsync(expected.Id);
             await _context.Entity.DeleteAsync(expected);
             var returnedAfterDelete = await _context.Entity.FetchAsync(expected.Id);
-            
+
 
             // Assert
             Assert.Equal(expected.Id, returned.Id);
@@ -64,12 +64,12 @@
         public async Task RedisSet_CanFetchBatch_ByIds()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "A_RedisSet_CanFetchBatch_ByIds_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "A_RedisSet_CanFetchBatch_ByIds_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
-            await Task.WhenAll( entities.Select(e => _context.Entity.InsertAsync(e)));
+            await Task.WhenAll(entities.Select(e => _context.Entity.InsertAsync(e)));
 
             // Act
             var returned = await _context.Entity.FetchAsync(Enumerable.Range(0, 100).Select(i => idGen(i)));
@@ -78,7 +78,7 @@
             Assert.Equal(100, returned.Count());
             Enumerable.Range(0, 100).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -88,8 +88,8 @@
         public async Task RedisSet_CanFetchBatch_ByIdAndLimit()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "B_RedisSet_CanFetchBatch_ByIdAndLimit_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "B_RedisSet_CanFetchBatch_ByIdAndLimit_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
@@ -102,7 +102,7 @@
             Assert.Equal(50, returned.Count());
             Enumerable.Range(50, 50).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)), string.Format("Id {0} not found in results", i))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -112,8 +112,8 @@
         public async Task RedisSet_CanFetchBatch_ByIdLimitAndOffset()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "C_RedisSet_CanFetchBatch_ByIdLimitAndOffset_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "C_RedisSet_CanFetchBatch_ByIdLimitAndOffset_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
@@ -128,7 +128,7 @@
             Assert.Equal(50, returned.Count());
             Enumerable.Range(50, 50).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)), string.Format("Id {0} not found in results", i))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -138,8 +138,8 @@
         public async Task RedisSet_CanFetchBatch_ByMinAndMaxID()
         {
             // Arrange
-            Func<int, string> idGen = (i) => "D_RedisSet_CanFetchBatch_ByMinAndMaxID_" + i.ToString("D5");
-            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity()
+            Func<int, string> idGen = i => "D_RedisSet_CanFetchBatch_ByMinAndMaxID_" + i.ToString("D5");
+            var entities = Enumerable.Range(0, 100).Select(i => new BasicEntity
             {
                 Id = idGen(i)
             });
@@ -152,7 +152,7 @@
             Assert.Equal(50, returned.Count());
             Enumerable.Range(10, 50).ToList().ForEach(i =>
                 Assert.True(returned.Any(e => e.Id == idGen(i)), string.Format("Id {0} not found in results", i))
-            );
+                );
 
             // Cleanup
             await Task.WhenAll(entities.Select(e => _context.Entity.DeleteAsync(e)));
@@ -162,7 +162,7 @@
         public async Task RedisSet_Insert_CannotOverwrite()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSet_Insert_CannotOverwrite"
             };
@@ -184,12 +184,12 @@
         {
             // Arrange
             var id = "RedisSet_InsertOrReplace_CanOverwrite";
-            var entityOld = new BasicEntity()
+            var entityOld = new BasicEntity
             {
                 Id = id,
                 StringValue = "Original"
             };
-            var entityNew = new BasicEntity()
+            var entityNew = new BasicEntity
             {
                 Id = id,
                 StringValue = "Replacement"
@@ -212,9 +212,9 @@
         public async Task RedisSet_Update_CannotInsertMissingItem()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
-                Id = "RedisSet_Update_CannotInsertMissingItem",
+                Id = "RedisSet_Update_CannotInsertMissingItem"
             };
 
             // Act
@@ -233,7 +233,7 @@
         public async Task RedisSet_Update_CanUpdateExistingItem()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSet_Update_CanUpdateExistingItem",
                 StringValue = "Original"
@@ -258,7 +258,7 @@
         public async Task RedisSet_Update_CannotUpdateChangedItem()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSet_Update_CannotUpdateChangedItem",
                 StringValue = "Original"
@@ -289,7 +289,7 @@
         public async Task RedisSet_Migrate_MigrationFunctionsGetsCalled()
         {
             // Arrange
-            var entity = new BasicEntity()
+            var entity = new BasicEntity
             {
                 Id = "RedisSet_Migrate_MigrationFunctionsGetsCalled",
                 StringValue = "SomeValue"

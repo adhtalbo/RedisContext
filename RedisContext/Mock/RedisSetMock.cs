@@ -8,7 +8,7 @@
 
     public class RedisSetMock<T> : RedisSet<T> where T : RedisEntity
     {
-        private SortedDictionary<string, Hash> _entities;
+        private readonly SortedDictionary<string, Hash> _entities;
 
         public RedisSetMock(RedisContext ctx, string name) : base(ctx, name)
         {
@@ -26,7 +26,7 @@
 
         public override Task<T> FetchAsync(string id)
         {
-            return Task.FromResult<T>(Fetch(id));
+            return Task.FromResult(Fetch(id));
         }
 
         public override IEnumerable<T> Fetch(IEnumerable<string> ids)
@@ -42,7 +42,10 @@
         public override IEnumerable<T> Fetch(string id, int limit, int offset = 0)
         {
             return
-                _entities.Where(x => (string.Compare(x.Key, id, StringComparison.Ordinal) >= 0)).Skip(offset).Take(limit).Select(x => Fetch(x.Key));
+                _entities.Where(x => (string.Compare(x.Key, id, StringComparison.Ordinal) >= 0))
+                    .Skip(offset)
+                    .Take(limit)
+                    .Select(x => Fetch(x.Key));
         }
 
         public override Task<IEnumerable<T>> FetchAsync(string id, int limit, int offset = 0)
@@ -72,7 +75,7 @@
 
             entity.Etag = Guid.NewGuid().ToString("N");
 
-            _entities[entity.Id] = new Hash()
+            _entities[entity.Id] = new Hash
             {
                 Data = ConvertEntity(entity),
                 Etag = entity.Etag,
@@ -91,7 +94,7 @@
         {
             entity.Etag = Guid.NewGuid().ToString("N");
 
-            _entities[entity.Id] = new Hash()
+            _entities[entity.Id] = new Hash
             {
                 Data = ConvertEntity(entity),
                 Etag = entity.Etag,
@@ -114,7 +117,7 @@
 
             entity.Etag = Guid.NewGuid().ToString("N");
 
-            _entities[entity.Id] = new Hash()
+            _entities[entity.Id] = new Hash
             {
                 Data = ConvertEntity(entity),
                 Etag = entity.Etag,
@@ -151,23 +154,6 @@
             return Task.FromResult(false);
         }
 
-        private class Hash
-        {
-            public string Etag { get; set; }
-            public string Id { get; set; }
-            public byte[] Data { get; set; }
-
-            public HashEntry[] GetHashEntry()
-            {
-                return new[]
-                {
-                    new HashEntry("etag", Etag),
-                    new HashEntry("id", Id),
-                    new HashEntry("data", Data),
-                };
-            } 
-        }
-
         private T ConvertEntity(Hash hash)
         {
             if (hash == null)
@@ -183,12 +169,29 @@
             var newSet = new RedisSetMock<T>(null, "");
 
             var data = oldSet.ConvertEntity(from);
-            return newSet.ConvertEntity(new Hash()
+            return newSet.ConvertEntity(new Hash
             {
                 Data = data,
                 Id = from.Id,
                 Etag = ""
             });
+        }
+
+        private class Hash
+        {
+            public string Etag { get; set; }
+            public string Id { get; set; }
+            public byte[] Data { get; set; }
+
+            public HashEntry[] GetHashEntry()
+            {
+                return new[]
+                {
+                    new HashEntry("etag", Etag),
+                    new HashEntry("id", Id),
+                    new HashEntry("data", Data)
+                };
+            }
         }
     }
 }

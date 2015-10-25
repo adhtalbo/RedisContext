@@ -1,11 +1,10 @@
 ﻿namespace RedisContext.Migration
 {
-    using System;
     using System.Collections.Generic;
     using MsgPack;
     using MsgPack.Serialization;
 
-    public class EntityProperties : Dictionary<String, EntityProperty>
+    public class EntityProperties : Dictionary<string, EntityProperty>
     {
         private static readonly MessagePackSerializer<Dictionary<MessagePackObject, MessagePackObject>> _serializer;
 

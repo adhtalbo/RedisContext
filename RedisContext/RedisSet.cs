@@ -11,32 +11,30 @@ namespace RedisContext
 
     public class RedisSet<T> where T : RedisEntity
     {
-        public string Name { get; private set; }
+        private readonly IEnumerable<MethodInfo> _migrationMethods;
 
-        public RedisContext Context { get; private set; }
+        private readonly IDictionary<uint, IEnumerable<MethodInfo>> _migrations;
 
         private readonly MessagePackSerializer<T> _serializer;
 
         private readonly uint _version;
-
-        private IEnumerable<MethodInfo> _migrationMethods;
-
-        private IDictionary<uint, IEnumerable<MethodInfo>> _migrations;
 
         internal RedisSet(RedisContext ctx, string name)
         {
             Context = ctx;
             Name = name;
 
-            var type = typeof(T);
-            var versionAttr = type.GetCustomAttributes(typeof(VersionAttribute), true).FirstOrDefault() as VersionAttribute;
+            var type = typeof (T);
+            var versionAttr =
+                type.GetCustomAttributes(typeof (VersionAttribute), true).FirstOrDefault() as VersionAttribute;
             _version = versionAttr == null ? 0 : versionAttr.Version;
 
             _serializer = Serializer.Create<T>();
 
             var allMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            _migrationMethods = allMethods.Where(method => method.GetCustomAttributes(typeof(MigrateAttribute), true).Any());
-            
+            _migrationMethods =
+                allMethods.Where(method => method.GetCustomAttributes(typeof (MigrateAttribute), true).Any());
+
             _migrations = new Dictionary<uint, IEnumerable<MethodInfo>>();
 
             for (uint i = 0; i < _version; i++)
@@ -45,10 +43,17 @@ namespace RedisContext
             }
         }
 
+        public string Name { get; private set; }
+
+        public RedisContext Context { get; private set; }
+
         private IEnumerable<MethodInfo> GetMigrationPaths(uint from = 0)
         {
-
-            var startpoints = _migrationMethods.Where(method => method.GetCustomAttributes(typeof(MigrateAttribute), true).Any(attr => ((MigrateAttribute)attr).From == from));
+            var startpoints =
+                _migrationMethods.Where(
+                    method =>
+                        method.GetCustomAttributes(typeof (MigrateAttribute), true)
+                            .Any(attr => ((MigrateAttribute) attr).From == from));
 
             var paths = new List<List<MethodInfo>>();
 
@@ -58,7 +63,7 @@ namespace RedisContext
 
                 if (end == _version)
                 {
-                    return new List<MethodInfo>() {startpoint};
+                    return new List<MethodInfo> {startpoint};
                 }
 
                 var path = new List<MethodInfo>();
@@ -75,7 +80,7 @@ namespace RedisContext
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(id);
             var serialized = db.HashGetAll(key);
-            return ConvertEntity(serialized);            
+            return ConvertEntity(serialized);
         }
 
         public virtual async Task<T> FetchAsync(string id)
@@ -102,7 +107,7 @@ namespace RedisContext
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var keys = ids.Select(GetKey);
             var tasks = keys.Select(key => db.HashGetAllAsync(key)).ToArray();
-            
+
             var results = await Task.WhenAll(tasks);
             return results.Select(ConvertEntity);
         }
@@ -112,7 +117,9 @@ namespace RedisContext
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var index = GetIndexKey();
 
-            var keys = db.SortedSetRangeByValue(index, id, default(RedisValue), Exclude.None, offset, limit).Select(x => x.ToString());
+            var keys =
+                db.SortedSetRangeByValue(index, id, default(RedisValue), Exclude.None, offset, limit)
+                    .Select(x => x.ToString());
             return Fetch(keys);
         }
 
@@ -121,7 +128,9 @@ namespace RedisContext
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var index = GetIndexKey();
 
-            var keys = db.SortedSetRangeByValue(index, id, default(RedisValue), Exclude.None, offset, limit).Select(x => x.ToString());
+            var keys =
+                db.SortedSetRangeByValue(index, id, default(RedisValue), Exclude.None, offset, limit)
+                    .Select(x => x.ToString());
             return FetchAsync(keys);
         }
 
@@ -155,7 +164,7 @@ namespace RedisContext
             var tran = db.CreateTransaction();
             tran.AddCondition(Condition.KeyNotExists(key));
 
-            tran.HashSetAsync(key, new HashEntry[]
+            tran.HashSetAsync(key, new[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
@@ -185,7 +194,7 @@ namespace RedisContext
             tran.AddCondition(Condition.KeyNotExists(key));
 
 #pragma warning disable 4014
-            tran.HashSetAsync(key, new HashEntry[]
+            tran.HashSetAsync(key, new[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
@@ -212,7 +221,7 @@ namespace RedisContext
 
             var serialized = ConvertEntity(entity);
 
-            db.HashSet(key, new HashEntry[]
+            db.HashSet(key, new[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
@@ -231,7 +240,7 @@ namespace RedisContext
 
             var serialized = ConvertEntity(entity);
 
-            await db.HashSetAsync(key, new HashEntry[]
+            await db.HashSetAsync(key, new[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
@@ -255,7 +264,7 @@ namespace RedisContext
             tran.AddCondition(Condition.KeyExists(key));
             tran.AddCondition(Condition.HashEqual(key, "etag", etag));
 
-            tran.HashSetAsync(key, new HashEntry[]
+            tran.HashSetAsync(key, new[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
@@ -285,7 +294,7 @@ namespace RedisContext
             tran.AddCondition(Condition.HashEqual(key, "etag", etag));
 
 #pragma warning disable 4014
-            tran.HashSetAsync(key, new HashEntry[]
+            tran.HashSetAsync(key, new[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
@@ -293,7 +302,7 @@ namespace RedisContext
             });
 #pragma warning restore 4014
 
-            if (! await tran.ExecuteAsync())
+            if (!await tran.ExecuteAsync())
             {
                 entity.Etag = etag;
                 return false;
@@ -405,14 +414,14 @@ namespace RedisContext
             }
 
             uint version = 0;
-            byte[] data = new byte[0];
+            var data = new byte[0];
 
             foreach (var item in serialized)
             {
                 switch (item.Name)
                 {
                     case "version":
-                        version = (uint) Convert.ChangeType(item.Value, typeof(uint));
+                        version = (uint) Convert.ChangeType(item.Value, typeof (uint));
                         break;
                     case "data":
                         data = item.Value;

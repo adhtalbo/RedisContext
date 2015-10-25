@@ -7,7 +7,7 @@
 
     public class EntityPropertiesTests
     {
-        private MessagePackSerializer<BasicEntity> _serializer;
+        private readonly MessagePackSerializer<BasicEntity> _serializer;
 
         public EntityPropertiesTests()
         {
@@ -22,7 +22,7 @@
         {
             // Arrange
             var expectedId = "SomeId";
-            var ob = new BasicEntity()
+            var ob = new BasicEntity
             {
                 Id = expectedId
             };
@@ -33,7 +33,7 @@
             var containsId = entityProperties.ContainsKey("Id");
             string returnedId;
             var isString = entityProperties["Id"].TryGet(out returnedId);
-            
+
 
             // Assert
             Assert.True(containsId);

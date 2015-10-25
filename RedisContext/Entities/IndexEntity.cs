@@ -2,7 +2,9 @@
 {
     public class IndexEntity : RedisEntity
     {
-        public IndexEntity() { }
+        public IndexEntity()
+        {
+        }
 
         public IndexEntity(RedisEntity entity, string indexValue)
         {

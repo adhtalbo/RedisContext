@@ -7,8 +7,6 @@ namespace RedisContext
 
     public abstract class RedisContext
     {
-        public ConnectionMultiplexer ConnectionMultiplexer { get; private set; }
-
         public RedisContext(ConnectionMultiplexer connectionMultiplexer)
         {
             ConnectionMultiplexer = connectionMultiplexer;
@@ -24,6 +22,8 @@ namespace RedisContext
             ConnectionMultiplexer = ConnectionMultiplexer.Connect(connectionString);
             Initialize();
         }
+
+        public ConnectionMultiplexer ConnectionMultiplexer { get; private set; }
 
         private static bool HasConnectionString(string key)
         {
@@ -45,7 +45,8 @@ namespace RedisContext
             {
                 methodName = "CreateMockRedisSet";
             }
-            var createRedisSetMethodInfo = typeof(RedisContext).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+            var createRedisSetMethodInfo = typeof (RedisContext).GetMethod(methodName,
+                BindingFlags.Instance | BindingFlags.NonPublic);
 
             var properties = type.GetProperties();
             var redisSetType = typeof (RedisSet<>);
@@ -58,7 +59,7 @@ namespace RedisContext
                     var entityType = property.PropertyType.GetGenericArguments()[0];
 
                     var value = createRedisSetMethodInfo.MakeGenericMethod(entityType)
-                       .Invoke(this, new object[] { this, property.Name });
+                        .Invoke(this, new object[] {this, property.Name});
 
                     property.SetValue(this, value);
                 }
@@ -73,6 +74,6 @@ namespace RedisContext
         private RedisSet<T> CreateMockRedisSet<T>(RedisContext ctx, string name) where T : RedisEntity
         {
             return new RedisSetMock<T>(ctx, name);
-        } 
+        }
     }
 }
