@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="Entities\IndexEntity.cs" />
     <Compile Include="Migration\MigrateAttribute.cs" />
+    <Compile Include="Mock\RedisContextMock.cs" />
+    <Compile Include="Mock\RedisSetMock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedisContext.cs" />
     <Compile Include="RedisEntity.cs" />

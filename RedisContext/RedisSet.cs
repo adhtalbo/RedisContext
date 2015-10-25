@@ -9,7 +9,7 @@ namespace RedisContext
     using MsgPack.Serialization;
     using StackExchange.Redis;
 
-    public sealed class RedisSet<T> where T : RedisEntity
+    public class RedisSet<T> where T : RedisEntity
     {
         public string Name { get; private set; }
 
@@ -19,9 +19,11 @@ namespace RedisContext
 
         private readonly uint _version;
 
+        private IEnumerable<MethodInfo> _migrationMethods;
+
         private IDictionary<uint, IEnumerable<MethodInfo>> _migrations;
 
-        public RedisSet(RedisContext ctx, string name)
+        internal RedisSet(RedisContext ctx, string name)
         {
             Context = ctx;
             Name = name;
@@ -31,6 +33,10 @@ namespace RedisContext
             _version = versionAttr == null ? 0 : versionAttr.Version;
 
             _serializer = Serializer.Create<T>();
+
+            var allMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            _migrationMethods = allMethods.Where(method => method.GetCustomAttributes(typeof(MigrateAttribute), true).Any());
+            
             _migrations = new Dictionary<uint, IEnumerable<MethodInfo>>();
 
             for (uint i = 0; i < _version; i++)
@@ -41,10 +47,8 @@ namespace RedisContext
 
         private IEnumerable<MethodInfo> GetMigrationPaths(uint from = 0)
         {
-            var type = typeof (T);
-            var methods = type.GetMethods().Where(method => method.GetCustomAttributes(typeof(MigrateAttribute), true).Any());
 
-            var startpoints = methods.Where(method => method.GetCustomAttributes(typeof(MigrateAttribute), true).Any(attr => ((MigrateAttribute) attr).From == from));
+            var startpoints = _migrationMethods.Where(method => method.GetCustomAttributes(typeof(MigrateAttribute), true).Any(attr => ((MigrateAttribute)attr).From == from));
 
             var paths = new List<List<MethodInfo>>();
 
@@ -66,15 +70,15 @@ namespace RedisContext
             return paths.DefaultIfEmpty(Enumerable.Empty<MethodInfo>()).OrderBy(x => x.Count()).FirstOrDefault();
         }
 
-        public T Fetch(string id)
+        public virtual T Fetch(string id)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(id);
             var serialized = db.HashGetAll(key);
-            return ConvertEntity(serialized);
+            return ConvertEntity(serialized);            
         }
 
-        public async Task<T> FetchAsync(string id)
+        public virtual async Task<T> FetchAsync(string id)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(id);
@@ -82,7 +86,7 @@ namespace RedisContext
             return ConvertEntity(serialized);
         }
 
-        public IEnumerable<T> Fetch(IEnumerable<string> ids)
+        public virtual IEnumerable<T> Fetch(IEnumerable<string> ids)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var keys = ids.Select(GetKey);
@@ -93,7 +97,7 @@ namespace RedisContext
             return tasks.Select(x => x.Result).Select(ConvertEntity);
         }
 
-        public async Task<IEnumerable<T>> FetchAsync(IEnumerable<string> ids)
+        public virtual async Task<IEnumerable<T>> FetchAsync(IEnumerable<string> ids)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var keys = ids.Select(GetKey);
@@ -103,7 +107,7 @@ namespace RedisContext
             return results.Select(ConvertEntity);
         }
 
-        public IEnumerable<T> Fetch(string id, int limit, int offset = 0)
+        public virtual IEnumerable<T> Fetch(string id, int limit, int offset = 0)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var index = GetIndexKey();
@@ -112,7 +116,7 @@ namespace RedisContext
             return Fetch(keys);
         }
 
-        public Task<IEnumerable<T>> FetchAsync(string id, int limit, int offset = 0)
+        public virtual Task<IEnumerable<T>> FetchAsync(string id, int limit, int offset = 0)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var index = GetIndexKey();
@@ -121,7 +125,7 @@ namespace RedisContext
             return FetchAsync(keys);
         }
 
-        public IEnumerable<T> Fetch(string min, string max)
+        public virtual IEnumerable<T> Fetch(string min, string max)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var index = GetIndexKey();
@@ -130,7 +134,7 @@ namespace RedisContext
             return Fetch(keys);
         }
 
-        public Task<IEnumerable<T>> FetchAsync(string min, string max)
+        public virtual Task<IEnumerable<T>> FetchAsync(string min, string max)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var index = GetIndexKey();
@@ -139,7 +143,7 @@ namespace RedisContext
             return FetchAsync(keys);
         }
 
-        public bool Insert(T entity)
+        public virtual bool Insert(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
@@ -168,7 +172,7 @@ namespace RedisContext
             return success;
         }
 
-        public async Task<bool> InsertAsync(T entity)
+        public virtual async Task<bool> InsertAsync(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
@@ -197,7 +201,7 @@ namespace RedisContext
             return success;
         }
 
-        public void InsertOrReplace(T entity)
+        public virtual void InsertOrReplace(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
@@ -216,7 +220,7 @@ namespace RedisContext
             UpdateIndex(entity);
         }
 
-        public async Task InsertOrReplaceAsync(T entity)
+        public virtual async Task InsertOrReplaceAsync(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
@@ -235,7 +239,7 @@ namespace RedisContext
             await UpdateIndexAsync(entity);
         }
 
-        public bool Update(T entity)
+        public virtual bool Update(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
@@ -246,6 +250,7 @@ namespace RedisContext
             var serialized = ConvertEntity(entity);
 
             var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
             tran.AddCondition(Condition.HashEqual(key, "etag", etag));
 
             tran.HashSetAsync(key, new HashEntry[]
@@ -255,10 +260,15 @@ namespace RedisContext
                 new HashEntry("version", entity.Version)
             });
 
-            return tran.Execute();
+            if (!tran.Execute())
+            {
+                entity.Etag = etag;
+                return false;
+            }
+            return true;
         }
 
-        public Task<bool> UpdateAsync(T entity)
+        public virtual async Task<bool> UpdateAsync(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
@@ -269,6 +279,7 @@ namespace RedisContext
             var serialized = ConvertEntity(entity);
 
             var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
             tran.AddCondition(Condition.HashEqual(key, "etag", etag));
 
             tran.HashSetAsync(key, new HashEntry[]
@@ -278,10 +289,15 @@ namespace RedisContext
                 new HashEntry("version", entity.Version)
             });
 
-            return tran.ExecuteAsync();
+            if (! await tran.ExecuteAsync())
+            {
+                entity.Etag = etag;
+                return false;
+            }
+            return true;
         }
 
-        public void Delete(T entity)
+        public virtual void Delete(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
@@ -289,12 +305,28 @@ namespace RedisContext
             RemoveIndex(entity);
         }
 
-        public async Task DeleteAsync(T entity)
+        public virtual async Task DeleteAsync(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();
             var key = GetKey(entity.Id);
             await db.KeyDeleteAsync(key);
             await RemoveIndexAsync(entity);
+        }
+
+        public virtual void Delete(string id)
+        {
+            var db = Context.ConnectionMultiplexer.GetDatabase();
+            var key = GetKey(id);
+            db.KeyDelete(key);
+            RemoveIndex(id);
+        }
+
+        public virtual async Task DeleteAsync(string id)
+        {
+            var db = Context.ConnectionMultiplexer.GetDatabase();
+            var key = GetKey(id);
+            await db.KeyDeleteAsync(key);
+            await RemoveIndexAsync(id);
         }
 
         private void UpdateIndex(T entity)
@@ -325,6 +357,20 @@ namespace RedisContext
             return db.SortedSetRemoveAsync(key, entity.Id);
         }
 
+        private void RemoveIndex(string id)
+        {
+            var db = Context.ConnectionMultiplexer.GetDatabase();
+            var key = GetIndexKey();
+            db.SortedSetRemove(key, id);
+        }
+
+        private Task RemoveIndexAsync(string id)
+        {
+            var db = Context.ConnectionMultiplexer.GetDatabase();
+            var key = GetIndexKey();
+            return db.SortedSetRemoveAsync(key, id);
+        }
+
         private RedisKey GetKey(string id)
         {
             return Name + ":" + id;
@@ -344,11 +390,16 @@ namespace RedisContext
 
         private IEnumerable<MethodInfo> GetMigrationMethods(uint from)
         {
-            return _migrations.ContainsKey(from) ? _migrations[from] : (IEnumerable<MethodInfo>) Enumerable.Empty<MemberInfo>();
+            return _migrations.ContainsKey(from) ? _migrations[from] : Enumerable.Empty<MethodInfo>();
         }
 
-        private T ConvertEntity(HashEntry[] serialized)
+        internal T ConvertEntity(HashEntry[] serialized)
         {
+            if (!serialized.Any())
+            {
+                return null;
+            }
+
             uint version = 0;
             byte[] data = new byte[0];
 
@@ -359,7 +410,7 @@ namespace RedisContext
                     case "version":
                         version = (uint) Convert.ChangeType(item.Value, typeof(uint));
                         break;
-                    case "date":
+                    case "data":
                         data = item.Value;
                         break;
                 }
@@ -369,13 +420,13 @@ namespace RedisContext
 
             if (version < _version)
             {
-                Migrate(_version, unpacked, data);
+                Migrate(version, unpacked, data);
             }
 
             return unpacked;
         }
 
-        private RedisValue ConvertEntity(T entity)
+        internal RedisValue ConvertEntity(T entity)
         {
             return _serializer.PackSingleObject(entity);
         }

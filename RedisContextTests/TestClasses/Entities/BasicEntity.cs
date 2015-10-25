@@ -4,6 +4,6 @@
 
     public class BasicEntity : RedisEntity
     {
-         
+        public string StringValue { get; set; }
     }
 }
