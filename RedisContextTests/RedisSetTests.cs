@@ -122,8 +122,6 @@
             // Act
             var returned = await _context.Entity.FetchAsync(idGen(0), 50, 50);
 
-            var ids = returned.Select(x => x.Id).ToArray();
-
             // Assert
             Assert.Equal(50, returned.Count());
             Enumerable.Range(50, 50).ToList().ForEach(i =>
