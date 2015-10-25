@@ -184,12 +184,14 @@ namespace RedisContext
             var tran = db.CreateTransaction();
             tran.AddCondition(Condition.KeyNotExists(key));
 
+#pragma warning disable 4014
             tran.HashSetAsync(key, new HashEntry[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
                 new HashEntry("version", entity.Version)
             });
+#pragma warning restore 4014
 
             var success = await tran.ExecuteAsync();
 
@@ -282,12 +284,14 @@ namespace RedisContext
             tran.AddCondition(Condition.KeyExists(key));
             tran.AddCondition(Condition.HashEqual(key, "etag", etag));
 
+#pragma warning disable 4014
             tran.HashSetAsync(key, new HashEntry[]
             {
                 new HashEntry("etag", entity.Etag),
                 new HashEntry("data", serialized),
                 new HashEntry("version", entity.Version)
             });
+#pragma warning restore 4014
 
             if (! await tran.ExecuteAsync())
             {

@@ -45,12 +45,12 @@
                 value = (T) Convert.ChangeType(this, typeof (T));
                 return true;
             }
-            catch (InvalidCastException ex)
+            catch (InvalidCastException)
             {
                 value = default(T);
                 return false;
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 value = default(T);
                 return false;
