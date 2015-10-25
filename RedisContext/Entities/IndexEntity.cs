@@ -9,9 +9,9 @@
         public IndexEntity(RedisEntity entity, string indexValue)
         {
             Id = indexValue;
-            ElementId = entity.Id;
+            EntityId = entity.Id;
         }
 
-        public string ElementId { get; set; }
+        public string EntityId { get; set; }
     }
 }
