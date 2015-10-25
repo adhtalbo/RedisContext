@@ -1,5 +1,6 @@
 language: csharp
 solution: RedisContext.sln
+sudo: required
 services:
   - redis-server
 install:
