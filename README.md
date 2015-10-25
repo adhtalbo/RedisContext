@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/adhtalbo/RedisContext.svg?branch=master)](https://travis-ci.org/adhtalbo/RedisContext)
 # Redis Context
 
-This is a project that allows Redis to be used a Document Database. In usage it provides a single class from which all entities can be accessed.
+This is a project that allows Redis to be used as a Document Database. In usage it provides a single class from which all entities can be accessed.
 
 ## Example
 First entities must be defined 
