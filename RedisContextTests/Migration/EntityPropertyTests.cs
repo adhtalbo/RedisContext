@@ -35,7 +35,7 @@
             var boolValue = Convert.ChangeType(entityProperty, TypeCode.Boolean);
 
             // Assert
-            Assert.True(isBool);
+            Assert.True(isBool != null && isBool.Value);
             Assert.Equal(expected, boolValue);
         }
 
@@ -51,7 +51,7 @@
             var charValue = Convert.ChangeType(entityProperty, TypeCode.Char);
 
             // Assert
-            Assert.True(isChar);
+            Assert.True(isChar != null && isChar.Value);
             Assert.Equal(expected, charValue);
         }
 
@@ -67,7 +67,7 @@
             var sbyteValue = Convert.ChangeType(entityProperty, TypeCode.SByte);
 
             // Assert
-            Assert.True(isSByte);
+            Assert.True(isSByte != null && isSByte.Value);
             Assert.Equal(expected, sbyteValue);
         }
 
@@ -83,7 +83,7 @@
             var byteValue = Convert.ChangeType(entityProperty, TypeCode.Byte);
 
             // Assert
-            Assert.True(isByte);
+            Assert.True(isByte != null && isByte.Value);
             Assert.Equal(expected, byteValue);
         }
 
@@ -99,7 +99,7 @@
             var shortValue = Convert.ChangeType(entityProperty, TypeCode.Int16);
 
             // Assert
-            Assert.True(isShort);
+            Assert.True(isShort != null && isShort.Value);
             Assert.Equal(expected, shortValue);
         }
 
@@ -115,7 +115,7 @@
             var ushortValue = Convert.ChangeType(entityProperty, TypeCode.UInt16);
 
             // Assert
-            Assert.True(isUShort);
+            Assert.True(isUShort != null && isUShort.Value);
             Assert.Equal(expected, ushortValue);
         }
 
@@ -131,7 +131,7 @@
             var intValue = Convert.ChangeType(entityProperty, TypeCode.Int32);
 
             // Assert
-            Assert.True(isInt);
+            Assert.True(isInt != null && isInt.Value);
             Assert.Equal(expected, intValue);
         }
 
@@ -147,7 +147,7 @@
             var uintValue = Convert.ChangeType(entityProperty, TypeCode.UInt32);
 
             // Assert
-            Assert.True(isUInt);
+            Assert.True(isUInt != null && isUInt.Value);
             Assert.Equal(expected, uintValue);
         }
 
@@ -163,7 +163,7 @@
             var longValue = Convert.ChangeType(entityProperty, TypeCode.Int64);
 
             // Assert
-            Assert.True(isLong);
+            Assert.True(isLong != null && isLong.Value);
             Assert.Equal(expected, longValue);
         }
 
@@ -179,7 +179,7 @@
             var ulongValue = Convert.ChangeType(entityProperty, TypeCode.UInt64);
 
             // Assert
-            Assert.True(isULong);
+            Assert.True(isULong != null && isULong.Value);
             Assert.Equal(expected, ulongValue);
         }
 
@@ -195,7 +195,7 @@
             var singleValue = Convert.ChangeType(entityProperty, TypeCode.Single);
 
             // Assert
-            Assert.True(isSingle);
+            Assert.True(isSingle != null && isSingle.Value);
             Assert.Equal(expected, singleValue);
         }
 
@@ -211,7 +211,7 @@
             var doubleValue = Convert.ChangeType(entityProperty, TypeCode.Double);
 
             // Assert
-            Assert.True(isDouble);
+            Assert.True(isDouble != null && isDouble.Value);
             Assert.Equal(expected, doubleValue);
         }
 
@@ -227,7 +227,7 @@
             var decimalValue = Convert.ChangeType(entityProperty, TypeCode.Decimal);
 
             // Assert
-            Assert.True(isDecimal);
+            Assert.True(isDecimal != null && isDecimal.Value);
             Assert.Equal(expected, decimalValue);
         }
 
@@ -243,7 +243,7 @@
             var datetimeValue = Convert.ChangeType(entityProperty, TypeCode.DateTime);
 
             // Assert
-            Assert.True(isDateTime);
+            Assert.True(isDateTime != null && isDateTime.Value);
             Assert.Equal(expected, datetimeValue);
         }
 
@@ -259,7 +259,7 @@
             var stringValue = Convert.ChangeType(entityProperty, TypeCode.String);
 
             // Assert
-            Assert.True(isString);
+            Assert.True(isString != null && isString.Value);
             Assert.Equal(expected, stringValue);
         }
 
