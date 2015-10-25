@@ -6,7 +6,7 @@
     public class BasicContextVersioned : RedisContext
     {
         public BasicContextVersioned()
-            : base("127.0.0.1")
+            : base("localhost")
         {
         }
 
