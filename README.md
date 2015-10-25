@@ -35,5 +35,5 @@ var entity = new BasicEntity(){
     AnotherValue = 42
 };
 
-context.Entity.Insert(entity);
+context.BasicEntity.Insert(entity);
 ```
