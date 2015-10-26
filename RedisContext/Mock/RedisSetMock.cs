@@ -132,6 +132,30 @@
             return Task.FromResult(Update(entity));
         }
 
+        public override bool Replace(T entity)
+        {
+            if (!_entities.ContainsKey(entity.Id))
+            {
+                return false;
+            }
+
+            entity.Etag = Guid.NewGuid().ToString("N");
+
+            _entities[entity.Id] = new Hash
+            {
+                Data = ConvertEntity(entity),
+                Etag = entity.Etag,
+                Id = entity.Id
+            };
+
+            return true;
+        }
+
+        public override Task<bool> ReplaceAsync(T entity)
+        {
+            return Task.FromResult(Replace(entity));
+        }
+
         public override void Delete(T entity)
         {
             _entities.Remove(entity.Id);

@@ -310,6 +310,64 @@ namespace RedisContext
             return true;
         }
 
+        public virtual bool Replace(T entity)
+        {
+            var db = Context.ConnectionMultiplexer.GetDatabase();
+            var key = GetKey(entity.Id);
+
+            var etag = entity.Etag;
+            entity.Etag = Guid.NewGuid().ToString("N");
+
+            var serialized = ConvertEntity(entity);
+
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
+
+            tran.HashSetAsync(key, new[]
+            {
+                new HashEntry("etag", entity.Etag),
+                new HashEntry("data", serialized),
+                new HashEntry("version", entity.Version)
+            });
+
+            if (!tran.Execute())
+            {
+                entity.Etag = etag;
+                return false;
+            }
+            return true;
+        }
+
+        public virtual async Task<bool> ReplaceAsync(T entity)
+        {
+            var db = Context.ConnectionMultiplexer.GetDatabase();
+            var key = GetKey(entity.Id);
+
+            var etag = entity.Etag;
+            entity.Etag = Guid.NewGuid().ToString("N");
+
+            var serialized = ConvertEntity(entity);
+
+            var tran = db.CreateTransaction();
+            tran.AddCondition(Condition.KeyExists(key));
+
+#pragma warning disable 4014
+            tran.HashSetAsync(key, new[]
+            {
+                new HashEntry("etag", entity.Etag),
+                new HashEntry("data", serialized),
+                new HashEntry("version", entity.Version)
+            });
+#pragma warning restore 4014
+
+            if (!await tran.ExecuteAsync())
+            {
+                entity.Etag = etag;
+                return false;
+            }
+            return true;
+        }
+
         public virtual void Delete(T entity)
         {
             var db = Context.ConnectionMultiplexer.GetDatabase();

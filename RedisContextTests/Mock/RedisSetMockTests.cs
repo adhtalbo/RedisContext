@@ -282,6 +282,55 @@
         }
 
         [Fact]
+        public async Task RedisSetMock_Replace_CannotInsertItem()
+        {
+            // Arrange
+            var entity = new BasicEntity
+            {
+                Id = "RedisSet_Replace_CannotInsertItem",
+                StringValue = "Original"
+            };
+
+            // Act
+            var success = await _context.Entity.ReplaceAsync(entity);
+            var returned = await _context.Entity.FetchAsync(entity.Id);
+
+            // Assert
+            Assert.False(success);
+            Assert.Null(returned);
+        }
+
+        [Fact]
+        public async Task RedisSetMock_Replace_CanUpdateExistingItem()
+        {
+            // Arrange
+            var oldEntity = new BasicEntity
+            {
+                Id = "RedisSet_Replace_CanUpdateExistingItem",
+                StringValue = "Original"
+            };
+
+            var newEntity = new BasicEntity
+            {
+                Id = "RedisSet_Replace_CanUpdateExistingItem",
+                StringValue = "Repalcement"
+            };
+
+            // Act
+            await _context.Entity.InsertOrReplaceAsync(oldEntity);
+            var success = await _context.Entity.ReplaceAsync(newEntity);
+            var returned = await _context.Entity.FetchAsync(oldEntity.Id);
+
+            // Assert
+            Assert.True(success);
+            Assert.Equal(newEntity.Id, returned.Id);
+            Assert.Equal(newEntity.StringValue, returned.StringValue);
+
+            // Cleanup
+            await _context.Entity.DeleteAsync(oldEntity);
+        }
+
+        [Fact]
         public void RedisSetMock_Migrate_MigrationFunctionsGetsCalled()
         {
             // Arrange
